@@ -3,3 +3,5 @@ aiohttp
 requests
 aiofiles
 rsa
+passlib
+argon2_cffi

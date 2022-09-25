@@ -3,6 +3,8 @@ from transactionmanager import TransactionManager
 from fileutils import FileUtil
 from aiohttp import web
 import socketio
+from passlib.hash import argon2
+
 import rsa
 
 counter_file_path = 'counter.json'
@@ -16,32 +18,36 @@ transaction_manager = TransactionManager(counter_file_path, 'private.pem', 'publ
 # Triggered when a client connects to our socket.
 @server_io.event
 def connect(sid, socket, auth):
-    print(sid, 'connected')
-    creds = json.loads(auth)
-    room = creds['id']
+    id = json.loads(auth)['id']
+    pswd = json.loads(auth)['password']
+
+    if not isinstance(id, str):
+        id = str(id)
+    if not isinstance(pswd, str):
+        pswd = str(pswd)
+
+    creds = {'id': id, 'password': pswd}
+    room = id
+
     if not server_io.manager.rooms['/'].keys().__contains__(room):
         server_io.enter_room(sid, room)
-        print(sid, 'in room', room)
+        creds['password'] = argon2.hash(pswd)
         connected_clients.append({"id": sid, "credentials": creds})
 
     else:
-        if find_id(next(iter(server_io.manager.rooms['/'][room])))['credentials']['password'] == creds['password']:
+        if argon2.verify(creds['password'], find_id(next(iter(server_io.manager.rooms['/'][room])))['credentials']['password']):
             server_io.enter_room(sid, room)
             connected_clients.append({"id": sid, "credentials": creds})
-            print(sid, 'in room', room)
-            print(server_io.manager.rooms['/'][room].keys())
         else:
             disconnect(sid)
+
 
 
 # Triggered when a client disconnects from our socket
 @server_io.event
 def disconnect(sid):
-    print(sid, 'disconnected')
     if find_id(sid):
         connected_clients.remove(find_id(sid))
-    print(connected_clients)
-    # connected_clients.remove(find_id(sid))
 
 @server_io.on('action')
 def action(sid, data):
