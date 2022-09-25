@@ -1,30 +1,25 @@
 import json
 from transactionmanager import TransactionManager
-from fileutils import FileUtil
 from aiohttp import web
 import socketio
 from passlib.hash import argon2
-
-import rsa
 
 counter_file_path = 'counter.json'
 server_io = socketio.AsyncServer()
 app = web.Application()
 server_io.attach(app)
-connected_clients=[]
+connected_clients = []
 
 transaction_manager = TransactionManager(counter_file_path, 'private.pem', 'public.pem')
+
 
 # Triggered when a client connects to our socket.
 @server_io.event
 def connect(sid, socket, auth):
+    print(sid, 'connected')
     id = json.loads(auth)['id']
     pswd = json.loads(auth)['password']
-
-    if not isinstance(id, str):
-        id = str(id)
-    if not isinstance(pswd, str):
-        pswd = str(pswd)
+    id, pswd = check_creds_valid(sid, id, pswd)
 
     creds = {'id': id, 'password': pswd}
     room = id
@@ -35,12 +30,22 @@ def connect(sid, socket, auth):
         connected_clients.append({"id": sid, "credentials": creds})
 
     else:
-        if argon2.verify(creds['password'], find_id(next(iter(server_io.manager.rooms['/'][room])))['credentials']['password']):
+        if argon2.verify(creds['password'],
+                         find_id(next(iter(server_io.manager.rooms['/'][room])))['credentials']['password']):
             server_io.enter_room(sid, room)
             connected_clients.append({"id": sid, "credentials": creds})
         else:
             disconnect(sid)
 
+
+def check_creds_valid(sid, id, pswd):
+    if not isinstance(id, str):
+        id = str(id)
+    if not isinstance(pswd, str):
+        pswd = str(pswd)
+    if id == "" or pswd == "" or " " in id or " " in pswd:
+        disconnect(sid)
+    return id, pswd
 
 
 # Triggered when a client disconnects from our socket
@@ -48,6 +53,8 @@ def connect(sid, socket, auth):
 def disconnect(sid):
     if find_id(sid):
         connected_clients.remove(find_id(sid))
+    print(sid, 'disconnected')
+
 
 @server_io.on('action')
 async def action(sid, data):
@@ -83,11 +90,11 @@ async def action(sid, data):
     else:
         raise Exception("Invalid action given")
 
+
 def find_id(sid):
     for key, element in enumerate(connected_clients):
         if element['id'] == sid:
             return element
-
 
 
 def main():
