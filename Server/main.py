@@ -1,7 +1,6 @@
 import aiofiles
 import asyncio
 import json
-from decimal import Decimal
 
 counter_file_path = 'counter.json'
 
@@ -59,8 +58,5 @@ async def increase(ID, value):
     print(f"{value} has been added to your balance. It is now {new_balance}")
 
     # TODO: Update clients through sockets
-
-
-
 
 asyncio.run(main())
