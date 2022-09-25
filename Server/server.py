@@ -1,3 +1,5 @@
+import json
+
 from aiohttp import web
 import socketio
 import socket
@@ -12,27 +14,27 @@ connected_clients=[]
 @server_io.event
 def connect(sid, socket, auth):
     print(sid, 'connected')
-    print(auth)
-    room = str(sid)
+    creds = json.loads(auth)
+    room = creds['id']
     if not server_io.manager.rooms['/'].keys().__contains__(room):
         server_io.enter_room(sid, room)
-    # else:
-    #     # print(server_io.manager.rooms['/'][room].keys())
+        print(sid, 'in room', room)
+        connected_clients.append({"id": sid, "credentials": creds})
 
-    # print(server_io.manager.rooms['/'][room].keys()[0])
+    else:
+        if find_id(next(iter(server_io.manager.rooms['/'][room])))['credentials']['password'] == creds['password']:
+            server_io.enter_room(sid, room)
+            print(sid, 'in room', room)
 
-        # Pick a random session_id from keys
-        # Search that session_id in connected_clients
-        # Grab credentials and check passwords
+        else:
+            print(server_io.manager.rooms['/'][room].keys())
 
-    # print(server_io.manager.rooms['/'].keys().__contains__(room))
-    # connected_clients.append({"id": sid, "credentials": auth})
 
 # Triggered when a client disconnects from our socket
 @server_io.event
 def disconnect(sid):
     print(sid, 'disconnected')
-    connected_clients.remove(find_id(sid))
+    # connected_clients.remove(find_id(sid))
 
 def find_id(sid):
     for key, element in enumerate(connected_clients):
