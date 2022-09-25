@@ -39,3 +39,5 @@ async def execute_actions(user):
     for step in steps:
         sio.emit('action', step)
         sio.sleep(int(delay))
+
+    sio.disconnect()

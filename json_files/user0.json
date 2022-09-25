@@ -1,0 +1,19 @@
+{
+    "id": "Jan",
+    "password": "567",
+    "server":
+    {
+        "ip": "localhost",
+        "port": "8080"
+    },
+    "actions": {
+        "delay": "1",
+        "steps": [
+            "decrease 294",
+            "decrease 223",
+            "decrease 497",
+            "increase 374",
+            "increase 17"
+        ]
+    }
+}
