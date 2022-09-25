@@ -1,5 +1,5 @@
 {
-    "id": "234",
+    "id": "Jan",
     "password": "567",
     "server":
     {
@@ -9,11 +9,11 @@
     "actions": {
         "delay": "1",
         "steps": [
-            "increase 50",
-            "increase 10",
-            "decrease 5",
-            "decrease 5",
-            "increase 1"
+            "decrease 294",
+            "decrease 223",
+            "decrease 497",
+            "increase 374",
+            "increase 17"
         ]
     }
 }
