@@ -3,6 +3,5 @@ import client
 
 user = user_c.User("user1.json")
 
-client = client.Client(user)
 
-client.connect_to_server()
+client.connect_to_server(user)
