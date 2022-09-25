@@ -9,7 +9,7 @@
     "actions": {
         "delay": "1",
         "steps": [
-            "increase 50",
+            "test 50",
             "increase 10",
             "decrease 5",
             "decrease 5",

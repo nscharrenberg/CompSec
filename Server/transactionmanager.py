@@ -1,4 +1,5 @@
 import base64
+import sys
 
 import aiofiles
 import json
@@ -63,6 +64,12 @@ class TransactionManager:
     async def increase(self, data):
         user_id = data['user_id']
         value = data['value']
+
+        print(sys.maxsize + sys.maxsize)
+
+        if int(value) > sys.maxsize or int(value) < 0:
+            raise Exception("Value has exceeded the limit")
+
         balance = await self.get_user_balance(user_id)
 
         try:
@@ -86,6 +93,9 @@ class TransactionManager:
         user_id = data['user_id']
         value = data['value']
         balance = await self.get_user_balance(user_id)
+
+        if int(value) > sys.maxsize or int(value) < 0:
+            raise Exception("Value has exceeded the limit")
 
         try:
             formatted_value = float(value)

@@ -68,19 +68,26 @@ async def action(sid, data):
 
     if data_array[0].__contains__('increase'):
         data['action'] = 'increase'
-        await transaction_manager.increase(data)
+        try:
+            await transaction_manager.increase(data)
+        except Exception:
+            await server_io.emit('action', {'data': f"failed to increase the balance by {value}"})
 
         balance = await transaction_manager.get_user_balance(data['user_id'])
         await server_io.emit('action', {'data': f"Balance has been increased by {value} to {balance}"})
-        return "OK", f"Balance has been increased by {value} to {transaction_manager.get_user_balance(data['user_id'])}"
+        return "OK", f"Balance has been increased by {value} to {balance}"
     elif data_array[0].__contains__('decrease'):
         data['action'] = 'decrease'
-        await transaction_manager.decrease(data)
+        try:
+            await transaction_manager.decrease(data)
+        except Exception:
+            await server_io.emit('action', {'data': f"failed to increase the balance by {value}"})
 
         balance = await transaction_manager.get_user_balance(data['user_id'])
         await server_io.emit('action', {'data': f"Balance has been decreased by {value} to {balance}"})
-        return "OK", f"Balance has been decreased by {value} to {transaction_manager.get_user_balance(data['user_id'])}"
+        return "OK", f"Balance has been decreased by {value} to {balance}"
     else:
+        await server_io.emit('action', {'data': f"ERROR: You tried to perform an invalid action. You naughty person."})
         raise Exception("Invalid action given")
 
 def find_id(sid):
