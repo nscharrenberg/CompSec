@@ -1,61 +1,67 @@
-import aiofiles
 import asyncio
-import json
+from fileutils import FileUtil
+from transactionmanager import TransactionManager
+import rsa
 
 counter_file_path = 'counter.json'
 
 async def main():
-    print(await get_all_user_data())
-    await decrease("1", 5)
-    await increase("1", 10)
-    await increase("2", 5)
+    program = Program()
+    await program.start()
+    await program.increase("1", "1", 50)
+    await program.get_data("1")
 
 
-async def get_all_user_data():
-    async with aiofiles.open(counter_file_path, mode='r') as file:
-        contents = await file.read()
 
-    return json.loads(contents)
+# Basic Usage of the transactionmanager logic -> Take as inspiration for the websocket logic
+class Program:
+    def __init__(self):
+        self.public_util = None
+        self.private_util = None
+        self.file_utils = None
 
+    async def start(self):
+        self.private_util = FileUtil('private.pem', is_json=False)
+        self.public_util = FileUtil('public.pem', is_json=False)
 
-async def decrease(ID, value):
-    data = await get_all_user_data()
-    balance = data[ID]
+        private_key = await self.private_util.read()
+        private_key = rsa.PrivateKey.load_pkcs1(private_key)
+        public_key = await self.public_util.read()
+        public_key = rsa.PublicKey.load_pkcs1(public_key)
+        self.file_utils = TransactionManager(counter_file_path, private_key, public_key)
 
-    try:
-        new_balance = balance - value
-    except Exception:
-        raise Exception("The value to decrease must be a valid decimal number")
+    # Util function to generate public and private keys
+    async def generate_keys(self):
+        public_key, private_key = rsa.newkeys(1024)
 
-    if new_balance < 0:
-        raise Exception("Balance can not be negative!")
+        await self.private_util.write(private_key.save_pkcs1().decode(), is_json=False)
+        await self.public_util.write(public_key.save_pkcs1().decode(), is_json=False)
 
-    data[ID] = new_balance
+    async def get_data(self, user_id):
+        print("--------------------", user_id, "--------------------")
+        user_data = await self.file_utils.get_user_transactions(user_id)
+        print(user_data)
 
-    async with aiofiles.open(counter_file_path, mode='w') as file:
-        await file.write(json.dumps(data))
+        user_data = await self.file_utils.get_user_balance(user_id)
+        print(user_data)
 
-    print(f"{value} has been removed from your balance. It is now {new_balance}")
+    async def increase(self, user_id, session_id, value):
+        data = {
+            "user_id": user_id,
+            "session_id": session_id,
+            "value": value
+        }
 
-    # TODO: Update clients through sockets
+        await self.file_utils.increase(data)
 
+    async def decrease(self, user_id, session_id, value):
+        data = {
+            "user_id": user_id,
+            "session_id": session_id,
+            "value": value
+        }
 
-async def increase(ID, value):
-    data = await get_all_user_data()
-    balance = data[ID]
+        await self.file_utils.decrease(data)
 
-    try:
-        new_balance = balance + value
-    except Exception:
-        raise Exception("The value to increase must be a valid decimal number")
-
-    data[ID] = new_balance
-
-    async with aiofiles.open(counter_file_path, mode='w') as file:
-        await file.write(json.dumps(data))
-
-    print(f"{value} has been added to your balance. It is now {new_balance}")
-
-    # TODO: Update clients through sockets
 
 #asyncio.run(main())
