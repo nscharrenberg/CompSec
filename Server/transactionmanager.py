@@ -70,6 +70,8 @@ class TransactionManager:
         except Exception:
             raise Exception("Given value must be a numeric value")
 
+        print(data)
+
         transaction = {
             "user_id": self.encrypt(data['user_id']),
             "session_id": self.encrypt(data['session_id']),

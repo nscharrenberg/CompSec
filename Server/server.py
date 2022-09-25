@@ -44,27 +44,36 @@ def disconnect(sid):
     # connected_clients.remove(find_id(sid))
 
 @server_io.on('action')
-def action(sid, data):
+async def action(sid, data):
     data_array = data.split()
 
+    user_id = find_id(sid)
+
+    value = 1
+    if len(data_array) > 1:
+        value = data_array[1]
+
+    data = {
+        "user_id": user_id['credentials']['id'],
+        "session_id": sid,
+        "action": data_array[0],
+        "value": value
+    }
+
     if data_array[0].__contains__('increase'):
-        value = 1
-        if len(data_array) > 1:
-            value = data_array[1]
+        data['action'] = 'increase'
+        await transaction_manager.increase(data)
 
-        transaction_manager.increase(value)
-
-        server_io.emit('action', {'data': 'Balance has been increased'})
-        return "OK", "Balance has been increased"
+        balance = await transaction_manager.get_user_balance(data['user_id'])
+        await server_io.emit('action', {'data': f"Balance has been increased by {value} to {balance}"})
+        return "OK", f"Balance has been increased by {value} to {transaction_manager.get_user_balance(data['user_id'])}"
     elif data_array[0].__contains__('decrease'):
-        value = 1
-        if len(data_array) > 1:
-            value = data_array[1]
+        data['action'] = 'decrease'
+        await transaction_manager.decrease(data)
 
-        transaction_manager.decrease(value)
-
-        server_io.emit('action', {'data': 'Balance has been decreased'})
-        return "OK", "Balance has been decreased"
+        balance = await transaction_manager.get_user_balance(data['user_id'])
+        await server_io.emit('action', {'data': f"Balance has been decreased by {value} to {balance}"})
+        return "OK", f"Balance has been decreased by {value} to {transaction_manager.get_user_balance(data['user_id'])}"
     else:
         raise Exception("Invalid action given")
 
