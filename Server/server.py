@@ -25,8 +25,6 @@ def connect(sid, socket, auth):
         # Search that session_id in connected_clients
         # Grab credentials and check passwords
 
-
-
     # print(server_io.manager.rooms['/'].keys().__contains__(room))
     # connected_clients.append({"id": sid, "credentials": auth})
 
