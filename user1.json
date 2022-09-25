@@ -1,17 +1,16 @@
 {
-    "id": "ID",
-    "password": "PASSWORD",
+    "id": "234",
+    "password": "567",
     "server":
     {
-        "ip": "SERVER_IP",
-        "port": "PORT"
+        "ip": "localhost",
+        "port": "8080"
     },
     "actions": {
-        "delay": "DELAY IN SECONDS",
+        "delay": "20",
         "steps": [
             "ACTION 1",
-            "ACTION 2",
-            "..."
+            "ACTION 2"
         ]
     }
 }

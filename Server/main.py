@@ -64,4 +64,4 @@ class Program:
         await self.file_utils.decrease(data)
 
 
-asyncio.run(main())
+#asyncio.run(main())
