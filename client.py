@@ -11,10 +11,9 @@ def connect():
     print('connection established')
 
 
-@sio.event
-def my_message(data):
+@sio.on('action')
+def action(data):
     print('message received with ', data)
-    sio.emit('my response', {'response': 'my response'})
 
 
 @sio.event
@@ -36,9 +35,7 @@ async def execute_actions(user):
     url = "http://" + ip + ":" + port
 
     sio.connect(url, auth=json.dumps({"id": user.get_id(), "password": user.get_password()}))
-    await sio.wait()
     steps, delay = user.get_actions()
     for step in steps:
-        sio.send(json.dumps({"action": step}))
-        await sio.wait()
+        sio.emit('action', step)
         sio.sleep(int(delay))
