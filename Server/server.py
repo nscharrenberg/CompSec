@@ -27,16 +27,20 @@ def connect(sid, socket, auth):
     else:
         if find_id(next(iter(server_io.manager.rooms['/'][room])))['credentials']['password'] == creds['password']:
             server_io.enter_room(sid, room)
+            connected_clients.append({"id": sid, "credentials": creds})
             print(sid, 'in room', room)
-
-        else:
             print(server_io.manager.rooms['/'][room].keys())
+        else:
+            disconnect(sid)
 
 
 # Triggered when a client disconnects from our socket
 @server_io.event
 def disconnect(sid):
     print(sid, 'disconnected')
+    if find_id(sid):
+        connected_clients.remove(find_id(sid))
+    print(connected_clients)
     # connected_clients.remove(find_id(sid))
 
 @server_io.on('action')
@@ -70,8 +74,6 @@ def find_id(sid):
             return element
 
 
-# def make_connections_list():
-#     server_io.socket.clients =
 
 def main():
     print('running')
