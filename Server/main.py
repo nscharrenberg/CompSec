@@ -8,10 +8,6 @@ counter_file_path = 'counter.json'
 async def main():
     program = Program()
     await program.start()
-    await program.increase("1", "1", 50)
-    await program.get_data("1")
-
-
 
 # Basic Usage of the transactionmanager logic -> Take as inspiration for the websocket logic
 class Program:
@@ -36,32 +32,6 @@ class Program:
 
         await self.private_util.write(private_key.save_pkcs1().decode(), is_json=False)
         await self.public_util.write(public_key.save_pkcs1().decode(), is_json=False)
-
-    async def get_data(self, user_id):
-        print("--------------------", user_id, "--------------------")
-        user_data = await self.file_utils.get_user_transactions(user_id)
-        print(user_data)
-
-        user_data = await self.file_utils.get_user_balance(user_id)
-        print(user_data)
-
-    async def increase(self, user_id, session_id, value):
-        data = {
-            "user_id": user_id,
-            "session_id": session_id,
-            "value": value
-        }
-
-        await self.file_utils.increase(data)
-
-    async def decrease(self, user_id, session_id, value):
-        data = {
-            "user_id": user_id,
-            "session_id": session_id,
-            "value": value
-        }
-
-        await self.file_utils.decrease(data)
 
 
 #asyncio.run(main())

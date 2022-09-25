@@ -65,8 +65,6 @@ class TransactionManager:
         user_id = data['user_id']
         value = data['value']
 
-        print(sys.maxsize + sys.maxsize)
-
         if int(value) > sys.maxsize or int(value) < 0:
             raise Exception("Value has exceeded the limit")
 
@@ -76,8 +74,6 @@ class TransactionManager:
             formatted_value = float(value)
         except Exception:
             raise Exception("Given value must be a numeric value")
-
-        print(data)
 
         transaction = {
             "user_id": self.encrypt(data['user_id']),

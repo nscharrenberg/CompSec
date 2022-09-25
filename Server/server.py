@@ -79,6 +79,7 @@ async def action(sid, data):
             await transaction_manager.increase(data)
         except Exception:
             await server_io.emit('action', {'data': f"failed to increase the balance by {value}"})
+            return "ERROR", f"failed to increase the balance by {value}"
 
         balance = await transaction_manager.get_user_balance(data['user_id'])
         await server_io.emit('action', {'data': f"Balance has been increased by {value} to {balance}"})
@@ -89,6 +90,7 @@ async def action(sid, data):
             await transaction_manager.decrease(data)
         except Exception:
             await server_io.emit('action', {'data': f"failed to increase the balance by {value}"})
+            return "ERROR", f"failed to increase the balance by {value}"
 
         balance = await transaction_manager.get_user_balance(data['user_id'])
         await server_io.emit('action', {'data': f"Balance has been decreased by {value} to {balance}"})
