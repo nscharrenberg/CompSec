@@ -8,12 +8,9 @@ import rsa
 
 class TransactionManager:
     def __init__(self, file_path, private_key, public_key):
-        private_util = FileUtil(private_key, is_json=False)
-        public_util = FileUtil(public_key, is_json=False)
-
-        private_key = await private_util.read()
+        private_key = open(private_key, "r").read().encode('utf-8')
         self.private_key = rsa.PrivateKey.load_pkcs1(private_key)
-        public_key = await public_util.read()
+        public_key = open(public_key, "r").read().encode('utf-8')
         self.public_key = rsa.PublicKey.load_pkcs1(public_key)
         self.file_path = file_path
         self.file_utils = FileUtil(file_path)
