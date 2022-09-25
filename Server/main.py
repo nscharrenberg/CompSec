@@ -4,7 +4,6 @@ import json
 
 counter_file_path = 'counter.json'
 
-
 async def main():
     print(await get_all_user_data())
     await decrease("1", 5)
@@ -59,4 +58,4 @@ async def increase(ID, value):
 
     # TODO: Update clients through sockets
 
-asyncio.run(main())
+#asyncio.run(main())
