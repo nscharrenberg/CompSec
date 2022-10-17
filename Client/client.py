@@ -1,9 +1,14 @@
 import json
+import urllib3
 
 import socketio
 import asyncio
 
-sio = socketio.Client()
+# Generally this would not be here. But as it's a self-signed SSL cert, we'll get a bunch of spamming warnings otherwise.
+# Hence why we disable the warning
+urllib3.disable_warnings()
+
+sio = socketio.Client(ssl_verify=False)
 
 
 @sio.event
@@ -32,7 +37,7 @@ def connect_to_server(user):
 
 async def execute_actions(user):
     ip, port = user.get_server()
-    url = "http://" + ip + ":" + port
+    url = "https://" + ip + ":" + port
 
     sio.connect(url, auth=json.dumps({"id": user.get_id(), "password": user.get_password()}))
     steps, delay = user.get_actions()

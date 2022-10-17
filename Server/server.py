@@ -1,11 +1,13 @@
 import json
+import ssl
+
 from transactionmanager import TransactionManager
 from aiohttp import web
 import socketio
 from passlib.hash import argon2
 
 counter_file_path = 'counter.json'
-server_io = socketio.AsyncServer()
+server_io = socketio.AsyncServer(cors_allowed_origins='*')
 app = web.Application()
 server_io.attach(app)
 connected_clients = []
@@ -108,7 +110,9 @@ def find_id(sid):
 
 def main():
     print('running')
-    web.run_app(app)
+    ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+    ssl_context.load_cert_chain('certs/wild.localhost-2022-10-17-093251.cer', 'certs/wild.localhost-2022-10-17-093251.pkey')
+    web.run_app(app, ssl_context=ssl_context)
 
 
 main()
