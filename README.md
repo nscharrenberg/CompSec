@@ -31,3 +31,10 @@ Do make sure to completely clear the `counter.json` and put the below json in th
 }
 ```
 
+
+## Fix It
+We only got one remark on the "Break It" part, which was the network packages could be read as from which plane text could be read.
+During the "Build It" process, we were already aware of this issue, as we were not using any SSL/TLS protocols.
+
+During the "Fix It" we therefore implemented WSS and tested using Wireshark whether the network packages could still be read. Which we could not as they were now encrypted.
+
