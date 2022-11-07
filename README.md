@@ -38,3 +38,4 @@ During the "Build It" process, we were already aware of this issue, as we were n
 
 During the "Fix It" we therefore implemented WSS and tested using Wireshark whether the network packages could still be read. Which we could not as they were now encrypted.
 
+We also looked at some remarks other groups got and tested them, but for those that we looked at we gave back error messages when constraints were not met.
